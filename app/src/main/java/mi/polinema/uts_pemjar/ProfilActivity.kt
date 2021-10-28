@@ -63,19 +63,11 @@ class ProfilActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when (p0!!.id) {
             R.id.btnSimpan -> {
-//                dbProdi.child(prodi.kode!!).child("namaProdi").setValue(edNamaProdi.text.toString())
-//                dbProdi.child(prodi.kode!!).child("alamatProdi").setValue(edAlamatProdi.text.toString())
-                db.child(user.id).setValue(
-                    User(
-                        user.id,
-                        EmailProfil.text.toString(),
-                        UsernameProfil.text.toString(),
-                        user.password.toString(),
-                        NamaProfil.text.toString(),
-                        AlamatProfil.text.toString(),
-                        No_telpProfil.text.toString()
-                    )
-                ).addOnCompleteListener {
+                db.child(user.id).child("alamat").setValue(AlamatProfil.text.toString())
+                db.child(user.id).child("nama").setValue(NamaProfil.text.toString())
+                db.child(user.id).child("telp").setValue(No_telpProfil.text.toString())
+                db.child(user.id).child("username").setValue(UsernameProfil.text.toString())
+                .addOnCompleteListener {
                     Toast.makeText(
                         this,
                         "File successfully uploaded",
