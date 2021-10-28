@@ -22,12 +22,6 @@ import kotlin.collections.HashMap
 
 class ProfilActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var db: DatabaseReference
-    val F_NAME = "nama_profil"
-    val F_EMAIL = "email"
-    val F_USER = "username"
-    val F_ALAMAT = "alamat_profil"
-    val F_NOMOR = "no_telepon"
-    var fileName = ""
     lateinit var user: User
     private lateinit var auth: FirebaseAuth
     var profil = Profil()
@@ -41,7 +35,6 @@ class ProfilActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profil)
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
         btnSimpan.setOnClickListener(this)
 
         auth = FirebaseAuth.getInstance()
@@ -56,7 +49,7 @@ class ProfilActivity : AppCompatActivity(), View.OnClickListener {
             UsernameProfil.setText(currentUser!!.displayName)
             EmailProfil.setText(currentUser!!.email)
         }
-        db = FirebaseDatabase.getInstance().getReference("TabelUsers")
+        db = FirebaseDatabase.getInstance("https://rio-raihan-d-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("TabelUsers")
     }
 
     fun showProfil() {
@@ -64,7 +57,7 @@ class ProfilActivity : AppCompatActivity(), View.OnClickListener {
         EmailProfil.setText(user.email)
         UsernameProfil.setText(user.username)
         AlamatProfil.setText(user.alamat)
-        user.telp?.let { No_telpProfil.setText(it) }
+        No_telpProfil.setText( user.telp.toString())
     }
 
     override fun onClick(p0: View?) {
@@ -75,10 +68,10 @@ class ProfilActivity : AppCompatActivity(), View.OnClickListener {
                         user.id,
                         EmailProfil.text.toString(),
                         UsernameProfil.text.toString(),
-                        user.password,
+                        user.password.toString(),
                         NamaProfil.text.toString(),
                         AlamatProfil.text.toString(),
-                        No_telpProfil.text.toString().toInt()
+                        No_telpProfil.text.toString()
                     )
                 ).addOnCompleteListener {
                     Toast.makeText(

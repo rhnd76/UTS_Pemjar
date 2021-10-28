@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     lateinit var perferences: SharedPreferences
 
     companion object {
-    lateinit var user: User
+        lateinit var user: User
         const val EXTRAUSER = "extra_user"
         const val pref_name = "user_email"
     }
@@ -65,15 +65,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             email = intent.getStringExtra(EXTRAUSER).toString()
         }
         perferences.edit().putString(pref_name, email)
-        db = FirebaseDatabase.getInstance().getReference("TabelUsers")
+        db =
+            FirebaseDatabase.getInstance("https://rio-raihan-d-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference("TabelUsers")
         db.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 var dataSnapshotIterable = snapshot.children
                 var iterator = dataSnapshotIterable.iterator()
-                while (iterator.hasNext()){
-                    Log.d("user email",iterator.next().toString())
-                    if(email == iterator.next().getValue(User::class.java)!!.email)
+                while (iterator.hasNext()) {
                     user = iterator.next().getValue(User::class.java)!!
+                    if (email == user.email)
+                        user = user
                 }
             }
 
