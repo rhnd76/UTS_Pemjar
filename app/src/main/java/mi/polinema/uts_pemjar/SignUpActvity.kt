@@ -11,18 +11,36 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_regirtasi.*
+import java.util.*
 
 class SignUpActvity : AppCompatActivity(), View.OnClickListener {
+
+
+    companion object {
+        var TAG = SignUpActvity::class.java.simpleName
+    }
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: DatabaseReference
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_regirtasi)
+
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseDatabase.getInstance("https://rio-raihan-d-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("TabelUsers")
+
+        btnRegis.setOnClickListener(this)
+    }
+
+
     override fun onClick(p0: View?) {
-        when(p0?.id){
-            R.id.btnRegis ->{
-                val email :String = etRegEmail.text.toString().trim()
-                val password :String = etRegPassword.text.toString().trim()
-                val username :String = etRegUsername.text.toString().trim()
+        when (p0?.id) {
+            R.id.btnRegis -> {
+                val email: String = etRegEmail.text.toString().trim()
+                val password: String = etRegPassword.text.toString().trim()
+                val username: String = etRegUsername.text.toString().trim()
 
                 if(email.isEmpty()){
                     etRegEmail.error = "Email harus diisi"
@@ -49,7 +67,7 @@ class SignUpActvity : AppCompatActivity(), View.OnClickListener {
                 }
 
 
-                registerUser(email, password,User(email,username,password,null,null,null))
+                registerUser(User(UUID.randomUUID().toString(),email, username, password))
             }
             R.id.btnLogRegister -> {
                 val intent = Intent(this, LoginActivity::class.java)
@@ -57,47 +75,33 @@ class SignUpActvity : AppCompatActivity(), View.OnClickListener {
             }
         }
     }
-
-    companion object {
-        var TAG = SignUpActvity::class.java.simpleName
-    }
-
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: DatabaseReference
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_regirtasi)
-
-        auth = FirebaseAuth.getInstance()
-        db = FirebaseDatabase.getInstance().getReference("TabelUsers")
-
-        btnRegis.setOnClickListener(this)
-    }
-
-    private fun registerUser(email: String, password: String,userData:User) {
-        auth.createUserWithEmailAndPassword(email, password)
+    private fun registerUser(userData: User) {
+        auth.createUserWithEmailAndPassword(userData.email, userData.password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "createUserWithEmail:success")
                     val currentUser = auth.currentUser!!
-                    if (currentUser!=null){
+                    if (currentUser != null) {
                         currentUser!!.updateProfile(userProfileChangeRequest {
                             displayName = etRegUsername.text.toString()
                         })
                         currentUser!!.sendEmailVerification()
-                        db.child(userData.email).setValue(userData).addOnCompleteListener {
+                        db.child(userData.id).setValue(userData).addOnCompleteListener {
                             Toast.makeText(
-                                this, "Berhasil mendaftarkan user, silahkan cek email anda untuk memferivikasi akun anda",
+                                this,
+                                "Berhasil mendaftarkan user, silahkan cek email anda untuk memferivikasi akun anda",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            val intent =Intent(this, LoginActivity::class.java)
+                            val intent = Intent(this, LoginActivity::class.java)
                             startActivity(intent)
-                            return@addOnCompleteListener
+//                            return@addOnCompleteListener
                         }
                     }
 
                 }
+            }
+            .addOnFailureListener {
+                Log.d("user register", it.message.toString())
             }
     }
 }

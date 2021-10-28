@@ -70,8 +70,9 @@ class ProfilActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when (p0!!.id) {
             R.id.btnSimpan -> {
-                db.child(user.email).setValue(
+                db.child(user.id).setValue(
                     User(
+                        user.id,
                         EmailProfil.text.toString(),
                         UsernameProfil.text.toString(),
                         user.password,

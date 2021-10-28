@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -67,7 +68,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         db = FirebaseDatabase.getInstance().getReference("TabelUsers")
         db.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                user = snapshot.child(email).getValue(User::class.java)!!
+                var dataSnapshotIterable = snapshot.children
+                var iterator = dataSnapshotIterable.iterator()
+                while (iterator.hasNext()){
+                    Log.d("user email",iterator.next().toString())
+                    if(email == iterator.next().getValue(User::class.java)!!.email)
+                    user = iterator.next().getValue(User::class.java)!!
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
